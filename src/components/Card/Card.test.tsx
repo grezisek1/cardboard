@@ -17,7 +17,7 @@ describe("Card editor", () => {
   });
 
   // Test if value on textarea is being set when firing change event in edit mode
-  it("fired onUpdateCard after close", () => {
+  it("changed input value", () => {
     if (formRef === null) {
       throw new Error("<Card>'s form must exist at this point of user input testing");
     }
