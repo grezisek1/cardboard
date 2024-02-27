@@ -16,6 +16,8 @@ describe('CardAddNew', () => {
   // Test if clicking on <CardAddNew /> fires onAddCard handler when component is disabled
   it("not fired onAddCard after click when disabled", () => {
     (cardAddNew as HTMLFormElement).disabled = true;
+    expect(cardAddNew).toBeDisabled();
+    
     fireEvent.click(cardAddNew);
     expect(mockAddCard).toHaveBeenCalledTimes(1);
   });
