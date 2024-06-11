@@ -1,5 +1,5 @@
 .textarea {
-  font-size: var(--font-size-16);
+  font-size: max(0px, var(--font-size-16) - var(--font-shrinkage-px, 0px));
   line-height: 25px;
   width: 100%;
   background: transparent;

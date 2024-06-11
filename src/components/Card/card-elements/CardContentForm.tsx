@@ -1,3 +1,4 @@
+import { useState, useRef } from 'react'
 import { useInput } from '../../../hooks/useInput'
 
 import { CardModelData } from '../../../data'
@@ -11,6 +12,8 @@ interface CardContentFormProps {
 
 export const CardContentForm = (props: CardContentFormProps) => {
   const { value, handleChange } = useInput(props.initialValues.content)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const [ fontShrinkagePx, setFrontShrinkagePx ] = useState(0)
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault()
@@ -23,6 +26,30 @@ export const CardContentForm = (props: CardContentFormProps) => {
     }
   }
 
+  const handleChangeDecorated = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    handleChange(e);
+    autoshrinkFontSize();
+  }
+
+  const autoshrinkFontSize = () => {
+    const fontShrinkagePxMax = 100;
+    let fontShrinkagePxCurrent = fontShrinkagePx;
+    shrinkUntilNoOverflow: while (textareaRef.current) {
+      if (fontShrinkagePxCurrent >= fontShrinkagePxMax) {
+        break shrinkUntilNoOverflow;
+      }
+      if (textareaRef.current.clientWidth == textareaRef.current.offsetWidth) {
+        break shrinkUntilNoOverflow;
+      }
+
+      fontShrinkagePxCurrent += 2;
+      textareaRef.current.style.setProperty("--font-shrinkage-px", `${fontShrinkagePxCurrent}px`);
+    }
+    if (fontShrinkagePxCurrent != fontShrinkagePx) {
+      setFrontShrinkagePx(fontShrinkagePxCurrent);
+    }
+  }
+
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
       <textarea
@@ -32,7 +59,8 @@ export const CardContentForm = (props: CardContentFormProps) => {
         value={value}
         onKeyDown={handleDeleteOnBackspace}
         onBlur={handleSubmit}
-        onChange={handleChange}
+        onChange={handleChangeDecorated}
+        ref={textareaRef}
       />
     </form>
   )
