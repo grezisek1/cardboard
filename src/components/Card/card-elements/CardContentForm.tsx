@@ -1,4 +1,3 @@
-import { useState, useRef } from 'react'
 import { useInput } from '../../../hooks/useInput'
 
 import { CardModelData } from '../../../data'
@@ -6,14 +5,13 @@ import styles from './CardContentForm.module.css'
 
 interface CardContentFormProps {
   initialValues: CardModelData
+  editorRef: React.RefObject<HTMLTextAreaElement>
   onSubmit(values: CardModelData): void
   onDeleteCard?(cardId: number): void
+  onInput?(): void
 }
-
 export const CardContentForm = (props: CardContentFormProps) => {
   const { value, handleChange } = useInput(props.initialValues.content)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const [ fontShrinkagePx, setFrontShrinkagePx ] = useState(0)
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault()
@@ -26,28 +24,9 @@ export const CardContentForm = (props: CardContentFormProps) => {
     }
   }
 
-  const handleChangeDecorated = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    handleChange(e);
-    autoshrinkFontSize();
-  }
-
-  const autoshrinkFontSize = () => {
-    const fontShrinkagePxMax = 100;
-    let fontShrinkagePxCurrent = fontShrinkagePx;
-    shrinkUntilNoOverflow: while (textareaRef.current) {
-      if (fontShrinkagePxCurrent >= fontShrinkagePxMax) {
-        break shrinkUntilNoOverflow;
-      }
-      if (textareaRef.current.clientWidth == textareaRef.current.offsetWidth) {
-        break shrinkUntilNoOverflow;
-      }
-
-      fontShrinkagePxCurrent += 2;
-      textareaRef.current.style.setProperty("--font-shrinkage-px", `${fontShrinkagePxCurrent}px`);
-    }
-    if (fontShrinkagePxCurrent != fontShrinkagePx) {
-      setFrontShrinkagePx(fontShrinkagePxCurrent);
-    }
+  const handleChangeDecorated = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    handleChange(event);
+    props.onInput?.();
   }
 
   return (
@@ -60,7 +39,7 @@ export const CardContentForm = (props: CardContentFormProps) => {
         onKeyDown={handleDeleteOnBackspace}
         onBlur={handleSubmit}
         onChange={handleChangeDecorated}
-        ref={textareaRef}
+        ref={props.editorRef}
       />
     </form>
   )
