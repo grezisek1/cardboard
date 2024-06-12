@@ -15,7 +15,10 @@ interface CardProps extends CardModelData {
 
 export const Card = (props: CardProps) => {
   const ref = useRef(null)
+  const editorRef = useRef<HTMLTextAreaElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const [isEditing, setEditing] = useState(false)
+  const [fontShrinkagePx, setFrontShrinkagePx] = useState(0)
 
   const handleSetEditingOff = () => {
     setEditing(false)
@@ -32,22 +35,46 @@ export const Card = (props: CardProps) => {
     handleSetEditingOff()
   }
 
+  const autoshrinkFontSize = () => {
+    const fontShrinkagePxMax = 100;
+    let fontShrinkagePxCurrent = fontShrinkagePx;
+    shrinkUntilNoOverflow: while (editorRef.current) {
+      if (fontShrinkagePxCurrent >= fontShrinkagePxMax) {
+        break shrinkUntilNoOverflow;
+      }
+      if (editorRef.current.clientWidth == editorRef.current.offsetWidth) {
+        break shrinkUntilNoOverflow;
+      }
+
+      fontShrinkagePxCurrent += 2;
+      containerRef.current?.style.setProperty("--font-shrinkage-px", `${fontShrinkagePxCurrent}px`);
+    }
+
+    if (fontShrinkagePxCurrent != fontShrinkagePx) {
+      setFrontShrinkagePx(fontShrinkagePxCurrent);
+    }
+  }
+
+
   return (
     <div
       data-cy={`card-${props.id}`}
       className={styles.card}
       onClick={handleSetEditingOn}
+      ref={containerRef}
     >
       <p className={styles.date}>
         {props.createdAt ? formatDate(props.createdAt) : 'Date'}
       </p>
       {!isEditing ? (
-        <p>{props?.content || 'Click to start noting'}</p>
+        <p className={styles.content}>{props?.content || 'Click to start noting'}</p>
       ) : (
         <CardContentForm
           initialValues={props}
           onSubmit={handleSaveContent}
+          onInput={autoshrinkFontSize}
           onDeleteCard={props.onDeleteCard}
+          editorRef={editorRef}
         />
       )}
     </div>

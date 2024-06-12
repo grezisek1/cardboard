@@ -1,6 +1,7 @@
 .textarea {
-  font-size: var(--font-size-16);
-  line-height: 25px;
+  --font-size: max(0px, var(--font-size-16) - var(--font-shrinkage-px, 0px));
+  font-size: var(--font-size);
+  line-height: calc(25px / max(1px, var(--font-size)));
   width: 100%;
   background: transparent;
   color: var(--color-wtf);

@@ -5,10 +5,11 @@ import styles from './CardContentForm.module.css'
 
 interface CardContentFormProps {
   initialValues: CardModelData
+  editorRef: React.RefObject<HTMLTextAreaElement>
   onSubmit(values: CardModelData): void
   onDeleteCard?(cardId: number): void
+  onInput?(): void
 }
-
 export const CardContentForm = (props: CardContentFormProps) => {
   const { value, handleChange } = useInput(props.initialValues.content)
 
@@ -23,6 +24,11 @@ export const CardContentForm = (props: CardContentFormProps) => {
     }
   }
 
+  const handleChangeDecorated = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    handleChange(event);
+    props.onInput?.();
+  }
+
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
       <textarea
@@ -32,7 +38,8 @@ export const CardContentForm = (props: CardContentFormProps) => {
         value={value}
         onKeyDown={handleDeleteOnBackspace}
         onBlur={handleSubmit}
-        onChange={handleChange}
+        onChange={handleChangeDecorated}
+        ref={props.editorRef}
       />
     </form>
   )

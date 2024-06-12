@@ -28,3 +28,11 @@
   line-height: var(--line-height-17);
   font-size: var(--font-size-14);
 }
+
+.content {
+  --font-size: max(0px, 1em - var(--font-shrinkage-px, 0px));
+  font-size: var(--font-size);
+  line-height: calc(25px / max(1px, var(--font-size)));
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
